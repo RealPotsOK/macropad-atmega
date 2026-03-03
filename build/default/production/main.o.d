@@ -13,10 +13,13 @@ build/default/production/main.o.d build/default/production/main.o: main.c \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\xmega.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\fuse.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\lock.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\eeprom.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\stddef.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h \
  c:\program\ files\microchip\xc8\v3.10\avr\avr\include\math.h \
- c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\stdbool.h
+ c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\stdbool.h \
+ c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include-fixed\limits.h
 
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\io.h:
 
@@ -46,6 +49,10 @@ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\fuse.h:
 
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\lock.h:
 
+c:\program\ files\microchip\xc8\v3.10\avr\avr\include\avr\eeprom.h:
+
+c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\stddef.h:
+
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay.h:
 
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h:
@@ -53,3 +60,5 @@ c:\program\ files\microchip\xc8\v3.10\avr\avr\include\util\delay_basic.h:
 c:\program\ files\microchip\xc8\v3.10\avr\avr\include\math.h:
 
 c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include\stdbool.h:
+
+c:\program\ files\microchip\xc8\v3.10\avr\lib\gcc\avr\5.4.0\include-fixed\limits.h:

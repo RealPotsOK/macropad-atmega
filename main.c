@@ -18,9 +18,26 @@
 #define VCP_TX_PIN PIN0_bm
 #define VCP_RX_PIN PIN1_bm
 
-// Software toggle switch button (PA1 -> switch -> GND)
-#define SW_PORT PORTA
-#define SW_PIN  PIN1_bm
+// 3x4 key matrix
+// Coordinate mapping:
+// row 0 -> PA7, row 1 -> PA6, row 2 -> PA5
+// col 0 -> PC0, col 1 -> PC1, col 2 -> PC2, col 3 -> PC3
+#define MATRIX_ROW_PORT PORTA
+#define MATRIX_COL_PORT PORTC
+#define MATRIX_ROWS 3U
+#define MATRIX_COLS 4U
+#define MATRIX_DEBOUNCE_MS 20U
+
+#define MATRIX_ROW0_PIN PIN7_bm
+#define MATRIX_ROW1_PIN PIN6_bm
+#define MATRIX_ROW2_PIN PIN5_bm
+#define MATRIX_ROWS_MASK (MATRIX_ROW0_PIN | MATRIX_ROW1_PIN | MATRIX_ROW2_PIN)
+
+#define MATRIX_COL0_PIN PIN0_bm
+#define MATRIX_COL1_PIN PIN1_bm
+#define MATRIX_COL2_PIN PIN2_bm
+#define MATRIX_COL3_PIN PIN3_bm
+#define MATRIX_COLS_MASK (MATRIX_COL0_PIN | MATRIX_COL1_PIN | MATRIX_COL2_PIN | MATRIX_COL3_PIN)
 
 // Rotary encoder pins
 #define ENC_PORT PORTE
@@ -80,9 +97,16 @@ static bool uart_read_byte(uint8_t *out)
 
 static void io_init(void)
 {
-    // SW input with internal pull-up.
-    SW_PORT.DIRCLR = SW_PIN;
-    SW_PORT.PIN1CTRL = PORT_PULLUPEN_bm;
+    // Matrix rows are driven outputs, idle high.
+    MATRIX_ROW_PORT.DIRSET = MATRIX_ROWS_MASK;
+    MATRIX_ROW_PORT.OUTSET = MATRIX_ROWS_MASK;
+
+    // Matrix columns are inputs with internal pull-ups.
+    MATRIX_COL_PORT.DIRCLR = MATRIX_COLS_MASK;
+    MATRIX_COL_PORT.PIN0CTRL = PORT_PULLUPEN_bm;
+    MATRIX_COL_PORT.PIN1CTRL = PORT_PULLUPEN_bm;
+    MATRIX_COL_PORT.PIN2CTRL = PORT_PULLUPEN_bm;
+    MATRIX_COL_PORT.PIN3CTRL = PORT_PULLUPEN_bm;
 
     // Rotary encoder inputs with internal pull-ups (CLK=PE1, DT=PE2, SW=PE3).
     ENC_PORT.DIRCLR = ENC_CLK_PIN | ENC_DT_PIN | ENC_SW_PIN;
@@ -91,15 +115,68 @@ static void io_init(void)
     ENC_PORT.PIN3CTRL = PORT_PULLUPEN_bm;
 }
 
-static inline bool sw_button_raw_is_high(void)
+static inline uint8_t matrix_row_pin_mask(uint8_t row)
 {
-    return (SW_PORT.IN & SW_PIN) != 0U;
+    switch (row)
+    {
+        case 0U: return MATRIX_ROW0_PIN;
+        case 1U: return MATRIX_ROW1_PIN;
+        default: return MATRIX_ROW2_PIN;
+    }
+}
+
+static inline uint8_t matrix_col_pin_mask(uint8_t col)
+{
+    switch (col)
+    {
+        case 0U: return MATRIX_COL0_PIN;
+        case 1U: return MATRIX_COL1_PIN;
+        case 2U: return MATRIX_COL2_PIN;
+        default: return MATRIX_COL3_PIN;
+    }
+}
+
+static void matrix_select_row(uint8_t row)
+{
+    MATRIX_ROW_PORT.OUTSET = MATRIX_ROWS_MASK;
+    MATRIX_ROW_PORT.OUTCLR = matrix_row_pin_mask(row);
+}
+
+static uint8_t matrix_scan_row_pressed_cols(uint8_t row)
+{
+    uint8_t pressed_cols = 0U;
+    uint8_t sample;
+
+    matrix_select_row(row);
+    _delay_us(3);
+    sample = MATRIX_COL_PORT.IN;
+
+    for (uint8_t col = 0U; col < MATRIX_COLS; col++)
+    {
+        if ((sample & matrix_col_pin_mask(col)) == 0U)
+        {
+            pressed_cols |= (uint8_t)(1U << col);
+        }
+    }
+
+    return pressed_cols;
 }
 
 static void send_sw_state(bool sw_state)
 {
     uart_write_str("SW=");
     uart_write_byte(sw_state ? '1' : '0');
+    uart_write_str("\r\n");
+}
+
+static void send_key_state(uint8_t row, uint8_t col, bool pressed)
+{
+    uart_write_str("KEY=");
+    uart_write_byte((uint8_t)('0' + row));
+    uart_write_byte(',');
+    uart_write_byte((uint8_t)('0' + col));
+    uart_write_byte(',');
+    uart_write_byte(pressed ? '1' : '0');
     uart_write_str("\r\n");
 }
 
@@ -608,7 +685,7 @@ int main(void)
     twi0_init();
     ssd1306_init();
 
-    uart_write_str("\r\nATmega4809 ready. SW=PA1, ENC=PE1/PE2, OLED=I2C PA3/PA2\r\n");
+    uart_write_str("\r\nATmega4809 ready. MATRIX R=PA7/PA6/PA5 C=PC0..PC3, ENC=PE1/PE2, OLED=PA3/PA2\r\n");
 
     bool sw_state;
     int32_t rx_enc_value;
@@ -617,10 +694,9 @@ int main(void)
     bool nv_dirty = false;
     uint16_t nv_dirty_ms = 0;
 
-    // Debounce for PA1 software switch.
-    bool sw_last_sample = true; // pull-up idle high
-    bool sw_stable_state = true;
-    uint8_t sw_stable_ms = 0;
+    // Matrix key debounce state.
+    bool key_state[MATRIX_ROWS][MATRIX_COLS] = {{false}};
+    uint8_t key_debounce_ms[MATRIX_ROWS][MATRIX_COLS] = {{0U}};
 
     // Encoder quadrature decode state.
     uint8_t enc_prev = encoder_state_2bit();
@@ -667,31 +743,50 @@ int main(void)
             }
         }
 
-        // SW toggle on PA1 press (HIGH -> LOW), then report to PC.
+        // Matrix scan and per-key debounce.
         {
-            bool sample = sw_button_raw_is_high();
+            for (uint8_t row = 0U; row < MATRIX_ROWS; row++)
+            {
+                uint8_t pressed_cols = matrix_scan_row_pressed_cols(row);
 
-            if (sample != sw_last_sample)
-            {
-                sw_last_sample = sample;
-                sw_stable_ms = 0;
-            }
-            else if (sw_stable_ms < 20U)
-            {
-                sw_stable_ms++;
-            }
-            else if (sw_stable_state != sample)
-            {
-                sw_stable_state = sample;
-                if (!sw_stable_state)
+                for (uint8_t col = 0U; col < MATRIX_COLS; col++)
                 {
-                    sw_state = !sw_state;
-                    send_sw_state(sw_state);
-                    oled_dirty = true;
-                    nv_dirty = true;
-                    nv_dirty_ms = 0;
+                    bool sample_pressed = (pressed_cols & (uint8_t)(1U << col)) != 0U;
+                    bool stable_pressed = key_state[row][col];
+
+                    if (sample_pressed == stable_pressed)
+                    {
+                        key_debounce_ms[row][col] = 0U;
+                        continue;
+                    }
+
+                    if (key_debounce_ms[row][col] < MATRIX_DEBOUNCE_MS)
+                    {
+                        key_debounce_ms[row][col]++;
+                    }
+
+                    if (key_debounce_ms[row][col] >= MATRIX_DEBOUNCE_MS)
+                    {
+                        key_debounce_ms[row][col] = 0U;
+                        key_state[row][col] = sample_pressed;
+
+                        // Key (0,0) acts as the software toggle switch.
+                        if (sample_pressed && (row == 0U) && (col == 0U))
+                        {
+                            sw_state = !sw_state;
+                            send_sw_state(sw_state);
+                            oled_dirty = true;
+                            nv_dirty = true;
+                            nv_dirty_ms = 0;
+                        }
+
+                        send_key_state(row, col, sample_pressed);
+                    }
                 }
             }
+
+            // Return all rows high between scans.
+            MATRIX_ROW_PORT.OUTSET = MATRIX_ROWS_MASK;
         }
 
         if (oled_dirty)

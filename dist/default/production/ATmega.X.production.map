@@ -621,66 +621,66 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x0000000000000000       0xf8
+.debug_aranges  0x0000000000000000      0x100
  *(.debug_aranges)
  .debug_aranges
-                0x0000000000000000       0x58 build/default/production/main.o
+                0x0000000000000000       0x60 build/default/production/main.o
  .debug_aranges
-                0x0000000000000058       0x20 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_byte.o)
+                0x0000000000000060       0x20 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_byte.o)
  .debug_aranges
-                0x0000000000000078       0x20 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_dword.o)
+                0x0000000000000080       0x20 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_dword.o)
  .debug_aranges
-                0x0000000000000098       0x20 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_byte.o)
+                0x00000000000000a0       0x20 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_byte.o)
  .debug_aranges
-                0x00000000000000b8       0x20 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_dword.o)
+                0x00000000000000c0       0x20 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_dword.o)
  .debug_aranges
-                0x00000000000000d8       0x20 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eewr_byte.o)
+                0x00000000000000e0       0x20 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eewr_byte.o)
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x0000000000000000     0x8808
+.debug_info     0x0000000000000000     0x8b71
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x0000000000000000     0x248a C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3/crtatmega4809.o
- .debug_info    0x000000000000248a     0x6019 build/default/production/main.o
- .debug_info    0x00000000000084a3       0xad C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_byte.o)
- .debug_info    0x0000000000008550       0xae C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_dword.o)
- .debug_info    0x00000000000085fe       0xae C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_byte.o)
- .debug_info    0x00000000000086ac       0xaf C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_dword.o)
- .debug_info    0x000000000000875b       0xad C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eewr_byte.o)
+ .debug_info    0x000000000000248a     0x6382 build/default/production/main.o
+ .debug_info    0x000000000000880c       0xad C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_byte.o)
+ .debug_info    0x00000000000088b9       0xae C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_dword.o)
+ .debug_info    0x0000000000008967       0xae C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_byte.o)
+ .debug_info    0x0000000000008a15       0xaf C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_dword.o)
+ .debug_info    0x0000000000008ac4       0xad C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eewr_byte.o)
 
-.debug_abbrev   0x0000000000000000     0x26a6
+.debug_abbrev   0x0000000000000000     0x26e0
  *(.debug_abbrev)
  .debug_abbrev  0x0000000000000000     0x2296 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3/crtatmega4809.o
- .debug_abbrev  0x0000000000002296      0x3ac build/default/production/main.o
- .debug_abbrev  0x0000000000002642       0x14 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_byte.o)
- .debug_abbrev  0x0000000000002656       0x14 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_dword.o)
- .debug_abbrev  0x000000000000266a       0x14 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_byte.o)
- .debug_abbrev  0x000000000000267e       0x14 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_dword.o)
- .debug_abbrev  0x0000000000002692       0x14 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eewr_byte.o)
+ .debug_abbrev  0x0000000000002296      0x3e6 build/default/production/main.o
+ .debug_abbrev  0x000000000000267c       0x14 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_byte.o)
+ .debug_abbrev  0x0000000000002690       0x14 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_dword.o)
+ .debug_abbrev  0x00000000000026a4       0x14 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_byte.o)
+ .debug_abbrev  0x00000000000026b8       0x14 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_dword.o)
+ .debug_abbrev  0x00000000000026cc       0x14 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eewr_byte.o)
 
-.debug_line     0x0000000000000000      0xd12
+.debug_line     0x0000000000000000      0xe6b
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x0000000000000000      0x187 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3/crtatmega4809.o
- .debug_line    0x0000000000000187      0x8e8 build/default/production/main.o
- .debug_line    0x0000000000000a6f       0x79 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_byte.o)
- .debug_line    0x0000000000000ae8       0x6e C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_dword.o)
- .debug_line    0x0000000000000b56       0x80 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_byte.o)
- .debug_line    0x0000000000000bd6       0x7b C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_dword.o)
- .debug_line    0x0000000000000c51       0xc1 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eewr_byte.o)
+ .debug_line    0x0000000000000187      0xa41 build/default/production/main.o
+ .debug_line    0x0000000000000bc8       0x79 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_byte.o)
+ .debug_line    0x0000000000000c41       0x6e C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_dword.o)
+ .debug_line    0x0000000000000caf       0x80 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_byte.o)
+ .debug_line    0x0000000000000d2f       0x7b C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_dword.o)
+ .debug_line    0x0000000000000daa       0xc1 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eewr_byte.o)
 
-.debug_frame    0x0000000000000000      0x150
+.debug_frame    0x0000000000000000      0x16c
  *(.debug_frame)
- .debug_frame   0x0000000000000000      0x150 build/default/production/main.o
+ .debug_frame   0x0000000000000000      0x16c build/default/production/main.o
 
-.debug_str      0x0000000000000000      0xffb
+.debug_str      0x0000000000000000     0x102e
  *(.debug_str)
  .debug_str     0x0000000000000000      0xf85 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3/crtatmega4809.o
- .debug_str     0x0000000000000f85       0x76 build/default/production/main.o
+ .debug_str     0x0000000000000f85       0xa9 build/default/production/main.o
 
-.debug_loc      0x0000000000000000     0x149c
+.debug_loc      0x0000000000000000     0x145d
  *(.debug_loc)
- .debug_loc     0x0000000000000000     0x149c build/default/production/main.o
+ .debug_loc     0x0000000000000000     0x145d build/default/production/main.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -700,9 +700,9 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x0000000000000000      0x1e8
+.debug_ranges   0x0000000000000000      0x290
  *(.debug_ranges)
- .debug_ranges  0x0000000000000000      0x1e8 build/default/production/main.o
+ .debug_ranges  0x0000000000000000      0x290 build/default/production/main.o
 
 .debug_macro
  *(.debug_macro)
@@ -715,377 +715,382 @@ LOAD data_init
  .note.gnu.avr.deviceinfo
                 0x0000000000000000       0x40 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3/crtatmega4809.o
 
-.bss.line.4135  0x0000000000802800       0x18
- .bss.line.4135
+.bss.line.4162  0x0000000000802800       0x18
+ .bss.line.4162
                 0x0000000000802800       0x18 build/default/production/main.o
 
-.bss.line_len.4136
+.bss.line_len.4163
                 0x0000000000802818        0x1
- .bss.line_len.4136
+ .bss.line_len.4163
                 0x0000000000802818        0x1 build/default/production/main.o
 
-.text.main      0x0000000000000172      0x904
- .text.main     0x0000000000000172      0x904 build/default/production/main.o
+.text.main      0x0000000000000172      0xad8
+ .text.main     0x0000000000000172      0xad8 build/default/production/main.o
                 0x0000000000000172                main
 
 .text.ssd1306_write_text
-                0x0000000000000a76      0x246
+                0x0000000000000c4a      0x246
  .text.ssd1306_write_text
-                0x0000000000000a76      0x246 build/default/production/main.o
+                0x0000000000000c4a      0x246 build/default/production/main.o
 
 .text.libgcc.div
-                0x0000000000000cbc       0xa2
+                0x0000000000000e90       0xa2
  .text.libgcc.div
-                0x0000000000000cbc       0xa2 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_udivmod64.o)
-                0x0000000000000cbc                __udivmod64
+                0x0000000000000e90       0xa2 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_udivmod64.o)
+                0x0000000000000e90                __udivmod64
+
+.rodata         0x0000000000804f32       0x99 load address 0x0000000000000f32
+ .rodata        0x0000000000804f32       0x99 build/default/production/main.o
 
 .text.ssd1306_clear
-                0x0000000000000d5e       0x92
+                0x0000000000000fcc       0x92
  .text.ssd1306_clear
-                0x0000000000000d5e       0x92 build/default/production/main.o
-
-.rodata         0x0000000000804df0       0x7f load address 0x0000000000000df0
- .rodata        0x0000000000804df0       0x7f build/default/production/main.o
+                0x0000000000000fcc       0x92 build/default/production/main.o
 
 .text.ssd1306_cmds
-                0x0000000000000e70       0x66
+                0x000000000000105e       0x66
  .text.ssd1306_cmds
-                0x0000000000000e70       0x66 build/default/production/main.o
+                0x000000000000105e       0x66 build/default/production/main.o
 
 .text.libgcc.div
-                0x0000000000000ed6       0x62
+                0x00000000000010c4       0x62
  .text.libgcc.div
-                0x0000000000000ed6       0x62 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_divdi3.o)
-                0x0000000000000ed6                __moddi3
-                0x0000000000000eda                __divdi3
-                0x0000000000000edc                __divdi3_moddi3
+                0x00000000000010c4       0x62 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_divdi3.o)
+                0x00000000000010c4                __moddi3
+                0x00000000000010c8                __divdi3
+                0x00000000000010ca                __divdi3_moddi3
 
 .text.libgcc.prologue
-                0x0000000000000f38       0x32
+                0x0000000000001126       0x32
  .text.libgcc.prologue
-                0x0000000000000f38       0x32 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_prologue.o)
-                0x0000000000000f38                __prologue_saves__
+                0x0000000000001126       0x32 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_prologue.o)
+                0x0000000000001126                __prologue_saves__
 
 .text.libgcc.builtins
-                0x0000000000000f6a       0x32
+                0x0000000000001158       0x32
  .text.libgcc.builtins
-                0x0000000000000f6a       0x32 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_ashldi3.o)
-                0x0000000000000f6a                __ashldi3
+                0x0000000000001158       0x32 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_ashldi3.o)
+                0x0000000000001158                __ashldi3
 
 .text.libgcc.prologue
-                0x0000000000000f9c       0x30
+                0x000000000000118a       0x30
  .text.libgcc.prologue
-                0x0000000000000f9c       0x30 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_epilogue.o)
-                0x0000000000000f9c                __epilogue_restores__
+                0x000000000000118a       0x30 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_epilogue.o)
+                0x000000000000118a                __epilogue_restores__
 
 .text.twi0_wait_wif
-                0x0000000000000fcc       0x28
+                0x00000000000011ba       0x28
  .text.twi0_wait_wif
-                0x0000000000000fcc       0x28 build/default/production/main.o
+                0x00000000000011ba       0x28 build/default/production/main.o
 
-.text.avrlibc   0x0000000000000ff4       0x28
- .text.avrlibc  0x0000000000000ff4       0x28 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eewr_byte.o)
-                0x0000000000000ff4                eeprom_write_byte
-                0x0000000000000ff6                eeprom_write_r18
-
-.text.uart_write_str
-                0x000000000000101c       0x20
- .text.uart_write_str
-                0x000000000000101c       0x20 build/default/production/main.o
+.text.avrlibc   0x00000000000011e2       0x28
+ .text.avrlibc  0x00000000000011e2       0x28 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eewr_byte.o)
+                0x00000000000011e2                eeprom_write_byte
+                0x00000000000011e4                eeprom_write_r18
 
 .text.twi0_start_write
-                0x000000000000103c       0x20
+                0x000000000000120a       0x20
  .text.twi0_start_write
-                0x000000000000103c       0x20 build/default/production/main.o
+                0x000000000000120a       0x20 build/default/production/main.o
 
-.text.libgcc    0x000000000000105c       0x20
- .text.libgcc   0x000000000000105c       0x20 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_negdi2.o)
-                0x000000000000105c                __negdi2
+.text.libgcc    0x000000000000122a       0x20
+ .text.libgcc   0x000000000000122a       0x20 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_negdi2.o)
+                0x000000000000122a                __negdi2
+
+.text.uart_write_str
+                0x000000000000124a       0x1e
+ .text.uart_write_str
+                0x000000000000124a       0x1e build/default/production/main.o
 
 .text.twi0_write_byte
-                0x000000000000107c       0x1e
+                0x0000000000001268       0x1e
  .text.twi0_write_byte
-                0x000000000000107c       0x1e build/default/production/main.o
+                0x0000000000001268       0x1e build/default/production/main.o
 
-.rodata.init_cmds.4283
-                0x000000000080509a       0x1c load address 0x000000000000109a
- .rodata.init_cmds.4283
-                0x000000000080509a       0x1c build/default/production/main.o
+.rodata.init_cmds.4310
+                0x0000000000805286       0x1c load address 0x0000000000001286
+ .rodata.init_cmds.4310
+                0x0000000000805286       0x1c build/default/production/main.o
 
 .text.libgcc.div
-                0x00000000000010b6       0x1c
+                0x00000000000012a2       0x1c
  .text.libgcc.div
-                0x00000000000010b6       0x1c c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_udivdi3.o)
-                0x00000000000010b6                __umoddi3
-                0x00000000000010ba                __udivdi3
-                0x00000000000010bc                __udivdi3_umoddi3
+                0x00000000000012a2       0x1c c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_udivdi3.o)
+                0x00000000000012a2                __umoddi3
+                0x00000000000012a6                __udivdi3
+                0x00000000000012a8                __udivdi3_umoddi3
 
-.text.avrlibc   0x00000000000010d2       0x18
- .text.avrlibc  0x00000000000010d2       0x18 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_dword.o)
-                0x00000000000010d2                eeprom_update_float
-                0x00000000000010d2                eeprom_update_dword
+.text.avrlibc   0x00000000000012be       0x18
+ .text.avrlibc  0x00000000000012be       0x18 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_dword.o)
+                0x00000000000012be                eeprom_update_float
+                0x00000000000012be                eeprom_update_dword
 
-.text.exit      0x00000000000010ea       0x16
- .text.exit     0x00000000000010ea       0x16 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3\libc.a(exit.o)
-                0x00000000000010ea                exit
+.text.exit      0x00000000000012d6       0x16
+ .text.exit     0x00000000000012d6       0x16 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3\libc.a(exit.o)
+                0x00000000000012d6                exit
 
-.text.avrlibc   0x0000000000001100       0x16
- .text.avrlibc  0x0000000000001100       0x16 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_byte.o)
-                0x0000000000001100                eeprom_update_byte
-                0x0000000000001102                eeprom_update_r18
+.text.avrlibc   0x00000000000012ec       0x16
+ .text.avrlibc  0x00000000000012ec       0x16 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eeupd_byte.o)
+                0x00000000000012ec                eeprom_update_byte
+                0x00000000000012ee                eeprom_update_r18
 
-.text.libgcc    0x0000000000001116       0x12
- .text.libgcc   0x0000000000001116       0x12 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_adddi3.o)
-                0x0000000000001116                __adddi3
+.text.libgcc    0x0000000000001302       0x12
+ .text.libgcc   0x0000000000001302       0x12 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_adddi3.o)
+                0x0000000000001302                __adddi3
 
-.text.libgcc    0x0000000000001128       0x12
- .text.libgcc   0x0000000000001128       0x12 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_cmpdi2_with_0.o)
-                0x0000000000001128                __cmpdi2_with_0
+.text.libgcc    0x0000000000001314       0x12
+ .text.libgcc   0x0000000000001314       0x12 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_cmpdi2_with_0.o)
+                0x0000000000001314                __cmpdi2_with_0
 
-.text.avrlibc   0x000000000000113a       0x10
- .text.avrlibc  0x000000000000113a       0x10 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_byte.o)
-                0x000000000000113a                eeprom_read_byte
-                0x0000000000001142                eeprom_mapen
+.text.uart_write_byte
+                0x0000000000001326       0x10
+ .text.uart_write_byte
+                0x0000000000001326       0x10 build/default/production/main.o
 
-.text.avrlibc   0x000000000000114a        0xe
- .text.avrlibc  0x000000000000114a        0xe C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_dword.o)
-                0x000000000000114a                eeprom_read_float
-                0x000000000000114a                eeprom_read_dword
+.text.avrlibc   0x0000000000001336       0x10
+ .text.avrlibc  0x0000000000001336       0x10 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_byte.o)
+                0x0000000000001336                eeprom_read_byte
+                0x000000000000133e                eeprom_mapen
 
-.text.libgcc    0x0000000000001158        0xc
- .text.libgcc   0x0000000000001158        0xc c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_tablejump2.o)
-                0x0000000000001158                __tablejump2__
+.text.avrlibc   0x0000000000001346        0xe
+ .text.avrlibc  0x0000000000001346        0xe C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3\libatmega4809.a(eerd_dword.o)
+                0x0000000000001346                eeprom_read_float
+                0x0000000000001346                eeprom_read_dword
 
-.rodata.Z.4214  0x0000000000805164        0x5 load address 0x0000000000001164
- .rodata.Z.4214
-                0x0000000000805164        0x5 build/default/production/main.o
+.text.libgcc    0x0000000000001354        0xc
+ .text.libgcc   0x0000000000001354        0xc c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/avrxmega3\libgcc.a(_tablejump2.o)
+                0x0000000000001354                __tablejump2__
 
-.rodata.Y.4213  0x0000000000805169        0x5 load address 0x0000000000001169
- .rodata.Y.4213
-                0x0000000000805169        0x5 build/default/production/main.o
+.rodata.Z.4241  0x0000000000805360        0x5 load address 0x0000000000001360
+ .rodata.Z.4241
+                0x0000000000805360        0x5 build/default/production/main.o
 
-.rodata.X.4212  0x000000000080516e        0x5 load address 0x000000000000116e
- .rodata.X.4212
-                0x000000000080516e        0x5 build/default/production/main.o
+.rodata.Y.4240  0x0000000000805365        0x5 load address 0x0000000000001365
+ .rodata.Y.4240
+                0x0000000000805365        0x5 build/default/production/main.o
 
-.rodata.W.4211  0x0000000000805173        0x5 load address 0x0000000000001173
- .rodata.W.4211
-                0x0000000000805173        0x5 build/default/production/main.o
+.rodata.X.4239  0x000000000080536a        0x5 load address 0x000000000000136a
+ .rodata.X.4239
+                0x000000000080536a        0x5 build/default/production/main.o
 
-.rodata.V.4210  0x0000000000805178        0x5 load address 0x0000000000001178
- .rodata.V.4210
-                0x0000000000805178        0x5 build/default/production/main.o
+.rodata.W.4238  0x000000000080536f        0x5 load address 0x000000000000136f
+ .rodata.W.4238
+                0x000000000080536f        0x5 build/default/production/main.o
 
-.rodata.U.4209  0x000000000080517d        0x5 load address 0x000000000000117d
- .rodata.U.4209
-                0x000000000080517d        0x5 build/default/production/main.o
+.rodata.V.4237  0x0000000000805374        0x5 load address 0x0000000000001374
+ .rodata.V.4237
+                0x0000000000805374        0x5 build/default/production/main.o
 
-.rodata.T.4208  0x0000000000805182        0x5 load address 0x0000000000001182
- .rodata.T.4208
-                0x0000000000805182        0x5 build/default/production/main.o
+.rodata.U.4236  0x0000000000805379        0x5 load address 0x0000000000001379
+ .rodata.U.4236
+                0x0000000000805379        0x5 build/default/production/main.o
 
-.rodata.S.4207  0x0000000000805187        0x5 load address 0x0000000000001187
- .rodata.S.4207
-                0x0000000000805187        0x5 build/default/production/main.o
+.rodata.T.4235  0x000000000080537e        0x5 load address 0x000000000000137e
+ .rodata.T.4235
+                0x000000000080537e        0x5 build/default/production/main.o
 
-.rodata.R.4206  0x000000000080518c        0x5 load address 0x000000000000118c
- .rodata.R.4206
-                0x000000000080518c        0x5 build/default/production/main.o
+.rodata.S.4234  0x0000000000805383        0x5 load address 0x0000000000001383
+ .rodata.S.4234
+                0x0000000000805383        0x5 build/default/production/main.o
 
-.rodata.Q.4205  0x0000000000805191        0x5 load address 0x0000000000001191
- .rodata.Q.4205
-                0x0000000000805191        0x5 build/default/production/main.o
+.rodata.R.4233  0x0000000000805388        0x5 load address 0x0000000000001388
+ .rodata.R.4233
+                0x0000000000805388        0x5 build/default/production/main.o
 
-.rodata.P.4204  0x0000000000805196        0x5 load address 0x0000000000001196
- .rodata.P.4204
-                0x0000000000805196        0x5 build/default/production/main.o
+.rodata.Q.4232  0x000000000080538d        0x5 load address 0x000000000000138d
+ .rodata.Q.4232
+                0x000000000080538d        0x5 build/default/production/main.o
 
-.rodata.O.4203  0x000000000080519b        0x5 load address 0x000000000000119b
- .rodata.O.4203
-                0x000000000080519b        0x5 build/default/production/main.o
+.rodata.P.4231  0x0000000000805392        0x5 load address 0x0000000000001392
+ .rodata.P.4231
+                0x0000000000805392        0x5 build/default/production/main.o
 
-.rodata.N.4202  0x00000000008051a0        0x5 load address 0x00000000000011a0
- .rodata.N.4202
-                0x00000000008051a0        0x5 build/default/production/main.o
+.rodata.O.4230  0x0000000000805397        0x5 load address 0x0000000000001397
+ .rodata.O.4230
+                0x0000000000805397        0x5 build/default/production/main.o
 
-.rodata.M.4201  0x00000000008051a5        0x5 load address 0x00000000000011a5
- .rodata.M.4201
-                0x00000000008051a5        0x5 build/default/production/main.o
+.rodata.N.4229  0x000000000080539c        0x5 load address 0x000000000000139c
+ .rodata.N.4229
+                0x000000000080539c        0x5 build/default/production/main.o
 
-.rodata.L.4200  0x00000000008051aa        0x5 load address 0x00000000000011aa
- .rodata.L.4200
-                0x00000000008051aa        0x5 build/default/production/main.o
+.rodata.M.4228  0x00000000008053a1        0x5 load address 0x00000000000013a1
+ .rodata.M.4228
+                0x00000000008053a1        0x5 build/default/production/main.o
 
-.rodata.K.4199  0x00000000008051af        0x5 load address 0x00000000000011af
- .rodata.K.4199
-                0x00000000008051af        0x5 build/default/production/main.o
+.rodata.L.4227  0x00000000008053a6        0x5 load address 0x00000000000013a6
+ .rodata.L.4227
+                0x00000000008053a6        0x5 build/default/production/main.o
 
-.rodata.J.4198  0x00000000008051b4        0x5 load address 0x00000000000011b4
- .rodata.J.4198
-                0x00000000008051b4        0x5 build/default/production/main.o
+.rodata.K.4226  0x00000000008053ab        0x5 load address 0x00000000000013ab
+ .rodata.K.4226
+                0x00000000008053ab        0x5 build/default/production/main.o
 
-.rodata.I.4197  0x00000000008051b9        0x5 load address 0x00000000000011b9
- .rodata.I.4197
-                0x00000000008051b9        0x5 build/default/production/main.o
+.rodata.J.4225  0x00000000008053b0        0x5 load address 0x00000000000013b0
+ .rodata.J.4225
+                0x00000000008053b0        0x5 build/default/production/main.o
 
-.rodata.H.4196  0x00000000008051be        0x5 load address 0x00000000000011be
- .rodata.H.4196
-                0x00000000008051be        0x5 build/default/production/main.o
+.rodata.I.4224  0x00000000008053b5        0x5 load address 0x00000000000013b5
+ .rodata.I.4224
+                0x00000000008053b5        0x5 build/default/production/main.o
 
-.rodata.G.4195  0x00000000008051c3        0x5 load address 0x00000000000011c3
- .rodata.G.4195
-                0x00000000008051c3        0x5 build/default/production/main.o
+.rodata.H.4223  0x00000000008053ba        0x5 load address 0x00000000000013ba
+ .rodata.H.4223
+                0x00000000008053ba        0x5 build/default/production/main.o
 
-.rodata.F.4194  0x00000000008051c8        0x5 load address 0x00000000000011c8
- .rodata.F.4194
-                0x00000000008051c8        0x5 build/default/production/main.o
+.rodata.G.4222  0x00000000008053bf        0x5 load address 0x00000000000013bf
+ .rodata.G.4222
+                0x00000000008053bf        0x5 build/default/production/main.o
 
-.rodata.E.4193  0x00000000008051cd        0x5 load address 0x00000000000011cd
- .rodata.E.4193
-                0x00000000008051cd        0x5 build/default/production/main.o
+.rodata.F.4221  0x00000000008053c4        0x5 load address 0x00000000000013c4
+ .rodata.F.4221
+                0x00000000008053c4        0x5 build/default/production/main.o
 
-.rodata.D.4192  0x00000000008051d2        0x5 load address 0x00000000000011d2
- .rodata.D.4192
-                0x00000000008051d2        0x5 build/default/production/main.o
+.rodata.E.4220  0x00000000008053c9        0x5 load address 0x00000000000013c9
+ .rodata.E.4220
+                0x00000000008053c9        0x5 build/default/production/main.o
 
-.rodata.C.4191  0x00000000008051d7        0x5 load address 0x00000000000011d7
- .rodata.C.4191
-                0x00000000008051d7        0x5 build/default/production/main.o
+.rodata.D.4219  0x00000000008053ce        0x5 load address 0x00000000000013ce
+ .rodata.D.4219
+                0x00000000008053ce        0x5 build/default/production/main.o
 
-.rodata.B.4190  0x00000000008051dc        0x5 load address 0x00000000000011dc
- .rodata.B.4190
-                0x00000000008051dc        0x5 build/default/production/main.o
+.rodata.C.4218  0x00000000008053d3        0x5 load address 0x00000000000013d3
+ .rodata.C.4218
+                0x00000000008053d3        0x5 build/default/production/main.o
 
-.rodata.A.4189  0x00000000008051e1        0x5 load address 0x00000000000011e1
- .rodata.A.4189
-                0x00000000008051e1        0x5 build/default/production/main.o
+.rodata.B.4217  0x00000000008053d8        0x5 load address 0x00000000000013d8
+ .rodata.B.4217
+                0x00000000008053d8        0x5 build/default/production/main.o
 
-.rodata.d9.4188
-                0x00000000008051e6        0x5 load address 0x00000000000011e6
- .rodata.d9.4188
-                0x00000000008051e6        0x5 build/default/production/main.o
+.rodata.A.4216  0x00000000008053dd        0x5 load address 0x00000000000013dd
+ .rodata.A.4216
+                0x00000000008053dd        0x5 build/default/production/main.o
 
-.rodata.d8.4187
-                0x00000000008051eb        0x5 load address 0x00000000000011eb
- .rodata.d8.4187
-                0x00000000008051eb        0x5 build/default/production/main.o
+.rodata.d9.4215
+                0x00000000008053e2        0x5 load address 0x00000000000013e2
+ .rodata.d9.4215
+                0x00000000008053e2        0x5 build/default/production/main.o
 
-.rodata.d7.4186
-                0x00000000008051f0        0x5 load address 0x00000000000011f0
- .rodata.d7.4186
-                0x00000000008051f0        0x5 build/default/production/main.o
+.rodata.d8.4214
+                0x00000000008053e7        0x5 load address 0x00000000000013e7
+ .rodata.d8.4214
+                0x00000000008053e7        0x5 build/default/production/main.o
 
-.rodata.d6.4185
-                0x00000000008051f5        0x5 load address 0x00000000000011f5
- .rodata.d6.4185
-                0x00000000008051f5        0x5 build/default/production/main.o
+.rodata.d7.4213
+                0x00000000008053ec        0x5 load address 0x00000000000013ec
+ .rodata.d7.4213
+                0x00000000008053ec        0x5 build/default/production/main.o
 
-.rodata.d5.4184
-                0x00000000008051fa        0x5 load address 0x00000000000011fa
- .rodata.d5.4184
-                0x00000000008051fa        0x5 build/default/production/main.o
+.rodata.d6.4212
+                0x00000000008053f1        0x5 load address 0x00000000000013f1
+ .rodata.d6.4212
+                0x00000000008053f1        0x5 build/default/production/main.o
 
-.rodata.d4.4183
-                0x00000000008051ff        0x5 load address 0x00000000000011ff
- .rodata.d4.4183
-                0x00000000008051ff        0x5 build/default/production/main.o
+.rodata.d5.4211
+                0x00000000008053f6        0x5 load address 0x00000000000013f6
+ .rodata.d5.4211
+                0x00000000008053f6        0x5 build/default/production/main.o
 
-.rodata.d3.4182
-                0x0000000000805204        0x5 load address 0x0000000000001204
- .rodata.d3.4182
-                0x0000000000805204        0x5 build/default/production/main.o
+.rodata.d4.4210
+                0x00000000008053fb        0x5 load address 0x00000000000013fb
+ .rodata.d4.4210
+                0x00000000008053fb        0x5 build/default/production/main.o
 
-.rodata.d2.4181
-                0x0000000000805209        0x5 load address 0x0000000000001209
- .rodata.d2.4181
-                0x0000000000805209        0x5 build/default/production/main.o
+.rodata.d3.4209
+                0x0000000000805400        0x5 load address 0x0000000000001400
+ .rodata.d3.4209
+                0x0000000000805400        0x5 build/default/production/main.o
 
-.rodata.d1.4180
-                0x000000000080520e        0x5 load address 0x000000000000120e
- .rodata.d1.4180
-                0x000000000080520e        0x5 build/default/production/main.o
+.rodata.d2.4208
+                0x0000000000805405        0x5 load address 0x0000000000001405
+ .rodata.d2.4208
+                0x0000000000805405        0x5 build/default/production/main.o
 
-.rodata.d0.4179
-                0x0000000000805213        0x5 load address 0x0000000000001213
- .rodata.d0.4179
-                0x0000000000805213        0x5 build/default/production/main.o
+.rodata.d1.4207
+                0x000000000080540a        0x5 load address 0x000000000000140a
+ .rodata.d1.4207
+                0x000000000080540a        0x5 build/default/production/main.o
 
-.rodata.minus.4178
-                0x0000000000805218        0x5 load address 0x0000000000001218
- .rodata.minus.4178
-                0x0000000000805218        0x5 build/default/production/main.o
+.rodata.d0.4206
+                0x000000000080540f        0x5 load address 0x000000000000140f
+ .rodata.d0.4206
+                0x000000000080540f        0x5 build/default/production/main.o
 
-.rodata.colon.4177
-                0x000000000080521d        0x5 load address 0x000000000000121d
- .rodata.colon.4177
-                0x000000000080521d        0x5 build/default/production/main.o
+.rodata.minus.4205
+                0x0000000000805414        0x5 load address 0x0000000000001414
+ .rodata.minus.4205
+                0x0000000000805414        0x5 build/default/production/main.o
 
-.rodata.blank.4176
-                0x0000000000805222        0x5 load address 0x0000000000001222
- .rodata.blank.4176
-                0x0000000000805222        0x5 build/default/production/main.o
+.rodata.colon.4204
+                0x0000000000805419        0x5 load address 0x0000000000001419
+ .rodata.colon.4204
+                0x0000000000805419        0x5 build/default/production/main.o
 
-.text           0x0000000000001228        0x4
- .text          0x0000000000001228        0x4 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3/crtatmega4809.o
-                0x0000000000001228                __vector_38
-                0x0000000000001228                __vector_22
-                0x0000000000001228                __vector_28
-                0x0000000000001228                __vector_1
-                0x0000000000001228                __vector_32
-                0x0000000000001228                __vector_34
-                0x0000000000001228                __vector_24
-                0x0000000000001228                __vector_12
-                0x0000000000001228                __bad_interrupt
-                0x0000000000001228                __vector_6
-                0x0000000000001228                __vector_31
-                0x0000000000001228                __vector_35
-                0x0000000000001228                __vector_39
-                0x0000000000001228                __vector_3
-                0x0000000000001228                __vector_23
-                0x0000000000001228                __vector_30
-                0x0000000000001228                __vector_25
-                0x0000000000001228                __vector_11
-                0x0000000000001228                __vector_13
-                0x0000000000001228                __vector_17
-                0x0000000000001228                __vector_19
-                0x0000000000001228                __vector_7
-                0x0000000000001228                __vector_27
-                0x0000000000001228                __vector_5
-                0x0000000000001228                __vector_33
-                0x0000000000001228                __vector_37
-                0x0000000000001228                __vector_4
-                0x0000000000001228                __vector_9
-                0x0000000000001228                __vector_2
-                0x0000000000001228                __vector_21
-                0x0000000000001228                __vector_15
-                0x0000000000001228                __vector_36
-                0x0000000000001228                __vector_29
-                0x0000000000001228                __vector_8
-                0x0000000000001228                __vector_26
-                0x0000000000001228                __vector_14
-                0x0000000000001228                __vector_10
-                0x0000000000001228                __vector_16
-                0x0000000000001228                __vector_18
-                0x0000000000001228                __vector_20
+.rodata.blank.4203
+                0x000000000080541e        0x5 load address 0x000000000000141e
+ .rodata.blank.4203
+                0x000000000080541e        0x5 build/default/production/main.o
 
-.text._Exit     0x000000000000122c        0x4
- .text._Exit    0x000000000000122c        0x4 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3\libc.a(_Exit.o)
-                0x000000000000122c                _Exit
+.text           0x0000000000001424        0x4
+ .text          0x0000000000001424        0x4 C:/Program Files/Microchip/MPLABX/v6.30/packs/Microchip/ATmega_DFP/3.5.296/xc8/avr/lib/avrxmega3/crtatmega4809.o
+                0x0000000000001424                __vector_38
+                0x0000000000001424                __vector_22
+                0x0000000000001424                __vector_28
+                0x0000000000001424                __vector_1
+                0x0000000000001424                __vector_32
+                0x0000000000001424                __vector_34
+                0x0000000000001424                __vector_24
+                0x0000000000001424                __vector_12
+                0x0000000000001424                __bad_interrupt
+                0x0000000000001424                __vector_6
+                0x0000000000001424                __vector_31
+                0x0000000000001424                __vector_35
+                0x0000000000001424                __vector_39
+                0x0000000000001424                __vector_3
+                0x0000000000001424                __vector_23
+                0x0000000000001424                __vector_30
+                0x0000000000001424                __vector_25
+                0x0000000000001424                __vector_11
+                0x0000000000001424                __vector_13
+                0x0000000000001424                __vector_17
+                0x0000000000001424                __vector_19
+                0x0000000000001424                __vector_7
+                0x0000000000001424                __vector_27
+                0x0000000000001424                __vector_5
+                0x0000000000001424                __vector_33
+                0x0000000000001424                __vector_37
+                0x0000000000001424                __vector_4
+                0x0000000000001424                __vector_9
+                0x0000000000001424                __vector_2
+                0x0000000000001424                __vector_21
+                0x0000000000001424                __vector_15
+                0x0000000000001424                __vector_36
+                0x0000000000001424                __vector_29
+                0x0000000000001424                __vector_8
+                0x0000000000001424                __vector_26
+                0x0000000000001424                __vector_14
+                0x0000000000001424                __vector_10
+                0x0000000000001424                __vector_16
+                0x0000000000001424                __vector_18
+                0x0000000000001424                __vector_20
+
+.text._Exit     0x0000000000001428        0x4
+ .text._Exit    0x0000000000001428        0x4 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3\libc.a(_Exit.o)
+                0x0000000000001428                _Exit
 
 .text.__dummy_fini
-                0x0000000000001230        0x2
+                0x000000000000142c        0x2
  .text.__dummy_fini
-                0x0000000000001230        0x2 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3\libc.a(exit.o)
-                0x0000000000001230                _fini
+                0x000000000000142c        0x2 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3\libc.a(exit.o)
+                0x000000000000142c                _fini
 
 .text.__dummy_funcs_on_exit
-                0x0000000000001232        0x2
+                0x000000000000142e        0x2
  .text.__dummy_funcs_on_exit
-                0x0000000000001232        0x2 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3\libc.a(exit.o)
-                0x0000000000001232                __funcs_on_exit
+                0x000000000000142e        0x2 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3\libc.a(exit.o)
+                0x000000000000142e                __funcs_on_exit
 
 .text.__dummy_simulator_exit
-                0x0000000000001234        0x2
+                0x0000000000001430        0x2
  .text.__dummy_simulator_exit
-                0x0000000000001234        0x2 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3\libc.a(exit.o)
-                0x0000000000001234                __simulator_exit
+                0x0000000000001430        0x2 c:/program files/microchip/xc8/v3.10/avr/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avrxmega3\libc.a(exit.o)
+                0x0000000000001430                __simulator_exit
