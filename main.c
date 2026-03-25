@@ -3,13 +3,17 @@
 #endif
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <avr/eeprom.h>
 #include <util/delay.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <limits.h>
+#include <string.h>
 
 #define BAUD_RATE 9600UL
+#define RX_ECHO_ENABLED 0
+#define UART_RX_BUDGET_PER_TICK 32U
 
 // ATmega4809 Curiosity-Nano style default VCP mapping is typically USART3 on PB0/PB1.
 #define VCP_USART USART3
@@ -41,19 +45,42 @@
 
 // Rotary encoder pins
 #define ENC_PORT PORTE
-#define ENC_CLK_PIN PIN1_bm
+#define ENC_SW_PIN  PIN1_bm
 #define ENC_DT_PIN  PIN2_bm
-#define ENC_SW_PIN  PIN3_bm
+#define ENC_CLK_PIN PIN3_bm
 
 // OLED I2C pins (TWI0 default route): SCL=PA3, SDA=PA2
 #define OLED_ADDR_7BIT 0x3CU
 #define I2C_FREQ_HZ 100000UL
+#define OLED_ENABLED 1
+#define OLED_BUFFER_SIZE 1024U
+#define OLED_RENDER_WIDTH_PX 128U
+#define OLED_RENDER_LINES 8U
+#define OLED_FLUSH_CHUNK_BYTES 8U
+#define OLED_TEXT_SEGMENTS 8U
+#define OLED_TEXT_MAX_CHARS 64U
 #define EEPROM_MAGIC 0xA5C35A7EUL
 #define EEPROM_SAVE_DELAY_MS 750U
 
 static uint32_t EEMEM ee_magic;
 static uint32_t EEMEM ee_rx_enc_u32;
-static uint8_t EEMEM ee_sw_u8;
+static uint8_t g_oled_buffer[OLED_BUFFER_SIZE];
+static char g_oled_lines[OLED_TEXT_SEGMENTS][OLED_TEXT_MAX_CHARS + 1U] = {
+    "READY",
+    "TEXT FROM PC",
+    "",
+    ""
+};
+static bool g_oled_text_dirty = false;
+static uint8_t g_oled_render_holdoff_ms = 0U;
+static bool g_oled_flush_active = false;
+static uint8_t g_oled_flush_page = 0U;
+static uint8_t g_oled_flush_col = 0U;
+static volatile int16_t g_enc_pending_steps = 0;
+static volatile int8_t g_enc_accum = 0;
+static volatile uint8_t g_enc_prev_state = 0;
+
+static void oled_render_text(void);
 
 static void uart_init(void)
 {
@@ -108,11 +135,11 @@ static void io_init(void)
     MATRIX_COL_PORT.PIN2CTRL = PORT_PULLUPEN_bm;
     MATRIX_COL_PORT.PIN3CTRL = PORT_PULLUPEN_bm;
 
-    // Rotary encoder inputs with internal pull-ups (CLK=PE1, DT=PE2, SW=PE3).
-    ENC_PORT.DIRCLR = ENC_CLK_PIN | ENC_DT_PIN | ENC_SW_PIN;
+    // Rotary encoder inputs with internal pull-ups (SW=PE1, DT=PE2, CLK=PE3).
+    ENC_PORT.DIRCLR = ENC_SW_PIN | ENC_DT_PIN | ENC_CLK_PIN;
     ENC_PORT.PIN1CTRL = PORT_PULLUPEN_bm;
-    ENC_PORT.PIN2CTRL = PORT_PULLUPEN_bm;
-    ENC_PORT.PIN3CTRL = PORT_PULLUPEN_bm;
+    ENC_PORT.PIN2CTRL = PORT_PULLUPEN_bm | PORT_ISC_BOTHEDGES_gc;
+    ENC_PORT.PIN3CTRL = PORT_PULLUPEN_bm | PORT_ISC_BOTHEDGES_gc;
 }
 
 static inline uint8_t matrix_row_pin_mask(uint8_t row)
@@ -162,13 +189,6 @@ static uint8_t matrix_scan_row_pressed_cols(uint8_t row)
     return pressed_cols;
 }
 
-static void send_sw_state(bool sw_state)
-{
-    uart_write_str("SW=");
-    uart_write_byte(sw_state ? '1' : '0');
-    uart_write_str("\r\n");
-}
-
 static void send_key_state(uint8_t row, uint8_t col, bool pressed)
 {
     uart_write_str("KEY=");
@@ -191,6 +211,22 @@ static void send_encoder_step(int8_t step)
         uart_write_str("ENC=-1\r\n");
     }
 }
+
+static void send_encoder_button(bool pressed)
+{
+    uart_write_str("ENC_SW=");
+    uart_write_byte(pressed ? '1' : '0');
+    uart_write_str("\r\n");
+}
+
+#if RX_ECHO_ENABLED
+static void uart_echo_raw_line(const char *line)
+{
+    uart_write_str("RAW:[");
+    uart_write_str(line);
+    uart_write_str("]\n");
+}
+#endif
 
 static inline uint8_t encoder_state_2bit(void)
 {
@@ -219,6 +255,45 @@ static int8_t encoder_transition_delta(uint8_t prev_state, uint8_t curr_state)
 
         default:
             return 0;
+    }
+}
+
+ISR(PORTE_PORT_vect)
+{
+    uint8_t flags = ENC_PORT.INTFLAGS;
+    ENC_PORT.INTFLAGS = flags;
+
+    if ((flags & (ENC_CLK_PIN | ENC_DT_PIN)) == 0U)
+    {
+        return;
+    }
+
+    {
+        uint8_t enc_curr = encoder_state_2bit();
+        int8_t enc_delta = encoder_transition_delta(g_enc_prev_state, enc_curr);
+        g_enc_prev_state = enc_curr;
+
+        if (enc_delta != 0)
+        {
+            g_enc_accum = (int8_t)(g_enc_accum + enc_delta);
+
+            if (g_enc_accum >= 4)
+            {
+                if (g_enc_pending_steps < INT16_MAX)
+                {
+                    g_enc_pending_steps++;
+                }
+                g_enc_accum = 0;
+            }
+            else if (g_enc_accum <= -4)
+            {
+                if (g_enc_pending_steps > INT16_MIN)
+                {
+                    g_enc_pending_steps--;
+                }
+                g_enc_accum = 0;
+            }
+        }
     }
 }
 
@@ -264,31 +339,97 @@ static bool parse_i32(const char *s, int32_t *out)
     return true;
 }
 
-static void process_rx_line(const char *line, bool *sw_state, int32_t *rx_enc_value, bool *oled_dirty)
+static void copy_oled_text_trimmed(char *dst, const char *src, uint8_t span_len, uint8_t max_chars)
 {
-    if ((line[0] == 'S') && (line[1] == 'W') && (line[2] == '=') &&
-        ((line[3] == '0') || (line[3] == '1')) && (line[4] == '\0'))
+    uint8_t start = 0U;
+    uint8_t end = span_len;
+    uint8_t n = 0U;
+
+    while ((start < end) && (src[start] == ' '))
     {
-        *sw_state = (line[3] == '1');
-        *oled_dirty = true;
-        return;
+        start++;
     }
 
-    if ((line[0] == 'E') && (line[1] == 'N') && (line[2] == 'C') && (line[3] == '='))
+    while ((end > start) && (src[end - 1U] == ' '))
+    {
+        end--;
+    }
+
+    // Remove matching single/double quotes around full span.
+    if ((end > (uint8_t)(start + 1U)) &&
+        ((src[start] == '\'' && src[end - 1U] == '\'') ||
+         (src[start] == '"'  && src[end - 1U] == '"')))
+    {
+        start++;
+        end--;
+    }
+
+    while ((start < end) && (n < max_chars))
+    {
+        char c = src[start++];
+        if ((c < ' ') || (c > '~')) c = ' ';
+        dst[n] = c;
+        n++;
+    }
+
+    dst[n] = '\0';
+}
+
+static void oled_set_text_payload(const char *payload)
+{
+    uint8_t line_idx = 0U;
+    const char *span_start = payload;
+    const char *p = payload;
+
+    while (line_idx < OLED_TEXT_SEGMENTS)
+    {
+        while ((*p != '\0') && (*p != '|'))
+        {
+            p++;
+        }
+
+        copy_oled_text_trimmed(
+            g_oled_lines[line_idx],
+            span_start,
+            (uint8_t)(p - span_start),
+            OLED_TEXT_MAX_CHARS
+        );
+        line_idx++;
+
+        if (*p == '\0')
+        {
+            break;
+        }
+
+        p++;
+        span_start = p;
+    }
+
+    while (line_idx < OLED_TEXT_SEGMENTS)
+    {
+        g_oled_lines[line_idx][0] = '\0';
+        line_idx++;
+    }
+
+    g_oled_text_dirty = true;
+    g_oled_render_holdoff_ms = 30U;
+}
+
+static void handle_command(const char *line, int32_t *rx_enc_value)
+{
+    if (strncmp(line, "ENC=", 4) == 0)
     {
         const char *v = &line[4];
 
         if ((v[0] == '+') && (v[1] == '1') && (v[2] == '\0'))
         {
             (*rx_enc_value)++;
-            *oled_dirty = true;
             return;
         }
 
         if ((v[0] == '-') && (v[1] == '1') && (v[2] == '\0'))
         {
             (*rx_enc_value)--;
-            *oled_dirty = true;
             return;
         }
 
@@ -297,43 +438,78 @@ static void process_rx_line(const char *line, bool *sw_state, int32_t *rx_enc_va
             if (parse_i32(v, &parsed))
             {
                 *rx_enc_value = parsed;
-                *oled_dirty = true;
             }
         }
+        return;
     }
-}
 
-static void uart_process_rx_commands(bool *sw_state, int32_t *rx_enc_value, bool *oled_dirty)
-{
-    static char line[24];
-    static uint8_t line_len = 0;
-    uint8_t b;
-
-    while (uart_read_byte(&b))
+    if (strncmp(line, "TXT:", 4) == 0)
     {
-        if ((b == '\n') || (b == '\r'))
+        oled_set_text_payload(&line[4]);
+        return;
+    }
+
+    if (strncmp(line, "OLED=", 5) == 0)
+    {
+        oled_set_text_payload(&line[5]);
+        return;
+    }
+
+    if (strncmp(line, "TXT=", 4) == 0)
+    {
+        oled_set_text_payload(&line[4]);
+        return;
+    }
+
+    if (strcmp(line, "CLR") == 0)
+    {
+        oled_set_text_payload("");
+        return;
+    }
+
+    // Treat any other line as display text.
+    if (line[0] != '\0')
+    {
+        oled_set_text_payload(line);
+    }
+}
+
+static char rx_buffer[128] = {0};
+static uint8_t rx_index = 0U;
+
+static void serial_task(int32_t *rx_enc_value)
+{
+    uint8_t c;
+    uint8_t budget = UART_RX_BUDGET_PER_TICK;
+
+    while ((budget-- > 0U) && uart_read_byte(&c))
+    {
+        if (c == '\r')
         {
-            if (line_len > 0U)
-            {
-                line[line_len] = '\0';
-                process_rx_line(line, sw_state, rx_enc_value, oled_dirty);
-                line_len = 0U;
-            }
+            continue;
         }
-        else
+
+        if (c == '\n')
         {
-            if (line_len < (uint8_t)(sizeof(line) - 1U))
-            {
-                line[line_len++] = (char)b;
-            }
-            else
-            {
-                line_len = 0U;
-            }
+            rx_buffer[rx_index] = '\0';
+#if RX_ECHO_ENABLED
+            uart_echo_raw_line(rx_buffer);
+#endif
+            handle_command(rx_buffer, rx_enc_value);
+
+            rx_index = 0U;
+            memset(rx_buffer, 0, sizeof(rx_buffer));
+            continue;
+        }
+
+        if (rx_index < (uint8_t)(sizeof(rx_buffer) - 1U))
+        {
+            rx_buffer[rx_index++] = (char)c;
         }
     }
 }
 
+#if OLED_ENABLED
 static void twi0_init(void)
 {
 #if defined(PORTMUX_TWI0_gm) && defined(PORTMUX_TWI0_DEFAULT_gc)
@@ -437,8 +613,35 @@ static bool ssd1306_set_cursor(uint8_t page, uint8_t col)
 static const uint8_t *font5x7(char c)
 {
     static const uint8_t blank[5] = {0x00,0x00,0x00,0x00,0x00};
+    static const uint8_t exclam[5] = {0x00,0x00,0x5F,0x00,0x00};
+    static const uint8_t quote[5] = {0x00,0x07,0x00,0x07,0x00};
+    static const uint8_t hash[5] = {0x14,0x7F,0x14,0x7F,0x14};
+    static const uint8_t dollar[5] = {0x24,0x2A,0x7F,0x2A,0x12};
+    static const uint8_t percent[5] = {0x23,0x13,0x08,0x64,0x62};
+    static const uint8_t ampersand[5] = {0x36,0x49,0x55,0x22,0x50};
+    static const uint8_t apostrophe[5] = {0x00,0x05,0x03,0x00,0x00};
+    static const uint8_t lparen[5] = {0x00,0x1C,0x22,0x41,0x00};
+    static const uint8_t rparen[5] = {0x00,0x41,0x22,0x1C,0x00};
+    static const uint8_t star[5] = {0x14,0x08,0x3E,0x08,0x14};
+    static const uint8_t plus[5] = {0x08,0x08,0x3E,0x08,0x08};
+    static const uint8_t comma[5] = {0x00,0x50,0x30,0x00,0x00};
+    static const uint8_t period[5] = {0x00,0x60,0x60,0x00,0x00};
     static const uint8_t colon[5] = {0x00,0x36,0x36,0x00,0x00};
+    static const uint8_t semicolon[5] = {0x00,0x56,0x36,0x00,0x00};
+    static const uint8_t less[5] = {0x08,0x14,0x22,0x41,0x00};
+    static const uint8_t equals[5] = {0x14,0x14,0x14,0x14,0x14};
+    static const uint8_t greater[5] = {0x00,0x41,0x22,0x14,0x08};
+    static const uint8_t question[5] = {0x02,0x01,0x51,0x09,0x06};
+    static const uint8_t at[5] = {0x32,0x49,0x79,0x41,0x3E};
+    static const uint8_t slash[5] = {0x20,0x10,0x08,0x04,0x02};
     static const uint8_t minus[5] = {0x08,0x08,0x08,0x08,0x08};
+    static const uint8_t lbrack[5] = {0x00,0x7F,0x41,0x41,0x00};
+    static const uint8_t backslash[5] = {0x02,0x04,0x08,0x10,0x20};
+    static const uint8_t rbrack[5] = {0x00,0x41,0x41,0x7F,0x00};
+    static const uint8_t caret[5] = {0x04,0x02,0x01,0x02,0x04};
+    static const uint8_t underscore[5] = {0x40,0x40,0x40,0x40,0x40};
+    static const uint8_t pipe[5] = {0x00,0x00,0x7F,0x00,0x00};
+    static const uint8_t tilde[5] = {0x08,0x04,0x08,0x10,0x08};
     static const uint8_t d0[5] = {0x3E,0x51,0x49,0x45,0x3E};
     static const uint8_t d1[5] = {0x00,0x42,0x7F,0x40,0x00};
     static const uint8_t d2[5] = {0x42,0x61,0x51,0x49,0x46};
@@ -476,14 +679,65 @@ static const uint8_t *font5x7(char c)
     static const uint8_t X[5] = {0x63,0x14,0x08,0x14,0x63};
     static const uint8_t Y[5] = {0x03,0x04,0x78,0x04,0x03};
     static const uint8_t Z[5] = {0x61,0x51,0x49,0x45,0x43};
-
-    if ((c >= 'a') && (c <= 'z')) c = (char)(c - ('a' - 'A'));
+    static const uint8_t a[5] = {0x20,0x54,0x54,0x54,0x78};
+    static const uint8_t b[5] = {0x7F,0x48,0x44,0x44,0x38};
+    static const uint8_t c_lower[5] = {0x38,0x44,0x44,0x44,0x20};
+    static const uint8_t d[5] = {0x38,0x44,0x44,0x48,0x7F};
+    static const uint8_t e_lower[5] = {0x38,0x54,0x54,0x54,0x18};
+    static const uint8_t f_lower[5] = {0x08,0x7E,0x09,0x01,0x02};
+    static const uint8_t g[5] = {0x08,0x14,0x54,0x54,0x3C};
+    static const uint8_t h_lower[5] = {0x7F,0x08,0x04,0x04,0x78};
+    static const uint8_t i_lower[5] = {0x00,0x44,0x7D,0x40,0x00};
+    static const uint8_t j_lower[5] = {0x20,0x40,0x44,0x3D,0x00};
+    static const uint8_t k_lower[5] = {0x7F,0x10,0x28,0x44,0x00};
+    static const uint8_t l_lower[5] = {0x00,0x41,0x7F,0x40,0x00};
+    static const uint8_t m_lower[5] = {0x7C,0x04,0x18,0x04,0x78};
+    static const uint8_t n_lower[5] = {0x7C,0x08,0x04,0x04,0x78};
+    static const uint8_t o_lower[5] = {0x38,0x44,0x44,0x44,0x38};
+    static const uint8_t p_lower[5] = {0x7C,0x14,0x14,0x14,0x08};
+    static const uint8_t q_lower[5] = {0x08,0x14,0x14,0x18,0x7C};
+    static const uint8_t r_lower[5] = {0x7C,0x08,0x04,0x04,0x08};
+    static const uint8_t s_lower[5] = {0x48,0x54,0x54,0x54,0x20};
+    static const uint8_t t_lower[5] = {0x04,0x3F,0x44,0x40,0x20};
+    static const uint8_t u_lower[5] = {0x3C,0x40,0x40,0x20,0x7C};
+    static const uint8_t v_lower[5] = {0x1C,0x20,0x40,0x20,0x1C};
+    static const uint8_t w_lower[5] = {0x3C,0x40,0x30,0x40,0x3C};
+    static const uint8_t x_lower[5] = {0x44,0x28,0x10,0x28,0x44};
+    static const uint8_t y_lower[5] = {0x0C,0x50,0x50,0x50,0x3C};
+    static const uint8_t z_lower[5] = {0x44,0x64,0x54,0x4C,0x44};
 
     switch (c)
     {
         case ' ': return blank;
+        case '!': return exclam;
+        case '"': return quote;
+        case '#': return hash;
+        case '$': return dollar;
+        case '%': return percent;
+        case '&': return ampersand;
+        case '\'': return apostrophe;
+        case '(': return lparen;
+        case ')': return rparen;
+        case '*': return star;
+        case '+': return plus;
+        case ',': return comma;
+        case '.': return period;
         case ':': return colon;
+        case ';': return semicolon;
+        case '<': return less;
+        case '=': return equals;
+        case '>': return greater;
+        case '?': return question;
+        case '@': return at;
+        case '/': return slash;
         case '-': return minus;
+        case '[': return lbrack;
+        case '\\': return backslash;
+        case ']': return rbrack;
+        case '^': return caret;
+        case '_': return underscore;
+        case '|': return pipe;
+        case '~': return tilde;
         case '0': return d0;
         case '1': return d1;
         case '2': return d2;
@@ -520,37 +774,70 @@ static const uint8_t *font5x7(char c)
         case 'X': return X;
         case 'Y': return Y;
         case 'Z': return Z;
+        case 'a': return a;
+        case 'b': return b;
+        case 'c': return c_lower;
+        case 'd': return d;
+        case 'e': return e_lower;
+        case 'f': return f_lower;
+        case 'g': return g;
+        case 'h': return h_lower;
+        case 'i': return i_lower;
+        case 'j': return j_lower;
+        case 'k': return k_lower;
+        case 'l': return l_lower;
+        case 'm': return m_lower;
+        case 'n': return n_lower;
+        case 'o': return o_lower;
+        case 'p': return p_lower;
+        case 'q': return q_lower;
+        case 'r': return r_lower;
+        case 's': return s_lower;
+        case 't': return t_lower;
+        case 'u': return u_lower;
+        case 'v': return v_lower;
+        case 'w': return w_lower;
+        case 'x': return x_lower;
+        case 'y': return y_lower;
+        case 'z': return z_lower;
         default:  return blank;
     }
 }
 
-static bool ssd1306_write_text(uint8_t page, uint8_t col, const char *s)
+static uint8_t font_glyph_span(const uint8_t *glyph, char c, uint8_t *start_col)
 {
-    if (!ssd1306_set_cursor(page, col)) return false;
-    if (!twi0_start_write(OLED_ADDR_7BIT)) return false;
-    if (!twi0_write_byte(0x40U)) { twi0_stop(); return false; }
+    uint8_t first = 0U;
+    uint8_t last = 0U;
+    bool found = false;
+    uint8_t i;
 
-    while ((*s != '\0') && (col <= 122U))
+    if (c == ' ')
     {
-        const uint8_t *g = font5x7(*s++);
-        for (uint8_t i = 0; i < 5U; i++)
-        {
-            if (!twi0_write_byte(g[i]))
-            {
-                twi0_stop();
-                return false;
-            }
-        }
-        if (!twi0_write_byte(0x00U))
-        {
-            twi0_stop();
-            return false;
-        }
-        col = (uint8_t)(col + 6U);
+        *start_col = 0U;
+        return 3U;
     }
 
-    twi0_stop();
-    return true;
+    for (i = 0U; i < 5U; i++)
+    {
+        if (glyph[i] != 0U)
+        {
+            if (!found)
+            {
+                first = i;
+                found = true;
+            }
+            last = i;
+        }
+    }
+
+    if (!found)
+    {
+        *start_col = 0U;
+        return 3U;
+    }
+
+    *start_col = first;
+    return (uint8_t)(last - first + 1U);
 }
 
 static void ssd1306_clear(void)
@@ -567,6 +854,101 @@ static void ssd1306_clear(void)
         }
 
         twi0_stop();
+    }
+}
+
+static void oled_flush_buffer(void)
+{
+    g_oled_flush_active = true;
+    g_oled_flush_page = 0U;
+    g_oled_flush_col = 0U;
+}
+
+static void oled_flush_step(void)
+{
+    uint8_t page;
+    uint8_t col;
+    uint8_t chunk;
+    uint16_t base;
+
+    if (!g_oled_flush_active)
+    {
+        return;
+    }
+
+    page = g_oled_flush_page;
+    col = g_oled_flush_col;
+
+    chunk = OLED_FLUSH_CHUNK_BYTES;
+    if ((uint16_t)col + chunk > OLED_RENDER_WIDTH_PX)
+    {
+        chunk = (uint8_t)(OLED_RENDER_WIDTH_PX - col);
+    }
+
+    base = ((uint16_t)page * OLED_RENDER_WIDTH_PX) + col;
+
+    if (ssd1306_set_cursor(page, col) &&
+        twi0_start_write(OLED_ADDR_7BIT) &&
+        twi0_write_byte(0x40U))
+    {
+        for (uint8_t i = 0U; i < chunk; i++)
+        {
+            if (!twi0_write_byte(g_oled_buffer[base + i]))
+            {
+                break;
+            }
+        }
+        twi0_stop();
+    }
+
+    col = (uint8_t)(col + chunk);
+    if (col >= OLED_RENDER_WIDTH_PX)
+    {
+        col = 0U;
+        page++;
+    }
+
+    if (page >= OLED_RENDER_LINES)
+    {
+        g_oled_flush_active = false;
+        return;
+    }
+
+    g_oled_flush_page = page;
+    g_oled_flush_col = col;
+}
+
+static uint8_t oled_char_advance(char c)
+{
+    const uint8_t *glyph = font5x7(c);
+    uint8_t start_col = 0U;
+    uint8_t span = font_glyph_span(glyph, c, &start_col);
+
+    if (c == ' ')
+    {
+        return span;
+    }
+
+    return (uint8_t)(span + 1U);
+}
+
+static void oled_draw_char_to_buffer(uint8_t page, uint8_t x, char c)
+{
+    const uint8_t *glyph = font5x7(c);
+    uint8_t start_col = 0U;
+    uint8_t span = font_glyph_span(glyph, c, &start_col);
+    uint16_t base;
+
+    if ((page >= OLED_RENDER_LINES) || (x >= OLED_RENDER_WIDTH_PX) || (c == ' '))
+    {
+        return;
+    }
+
+    base = (uint16_t)page * OLED_RENDER_WIDTH_PX;
+
+    for (uint8_t i = 0U; (i < span) && ((uint16_t)x + i < OLED_RENDER_WIDTH_PX); i++)
+    {
+        g_oled_buffer[base + x + i] = glyph[start_col + i];
     }
 }
 
@@ -598,83 +980,77 @@ static void ssd1306_init(void)
     ssd1306_clear();
 }
 
-static void i32_to_dec(int32_t value, char *out, uint8_t out_len)
+static void oled_render_text(void)
 {
-    char tmp[12];
-    uint8_t n = 0;
-    int64_t v = (int64_t)value;
-    bool neg = false;
+    uint8_t render_line = 0U;
+    bool first_segment = true;
 
-    if (out_len == 0U) return;
+    memset(g_oled_buffer, 0, sizeof(g_oled_buffer));
 
-    if (v < 0)
+    for (uint8_t seg = 0U; (seg < OLED_TEXT_SEGMENTS) && (render_line < OLED_RENDER_LINES); seg++)
     {
-        neg = true;
-        v = -v;
+        const char *s = g_oled_lines[seg];
+        uint8_t x = 0U;
+
+        if (!first_segment)
+        {
+            render_line++;
+            if (render_line >= OLED_RENDER_LINES)
+            {
+                break;
+            }
+        }
+        first_segment = false;
+
+        while ((*s != '\0') && (render_line < OLED_RENDER_LINES))
+        {
+            uint8_t adv = oled_char_advance(*s);
+
+            if ((x > 0U) && ((uint16_t)x + adv > OLED_RENDER_WIDTH_PX))
+            {
+                render_line++;
+                x = 0U;
+                if (render_line >= OLED_RENDER_LINES)
+                {
+                    break;
+                }
+            }
+
+            oled_draw_char_to_buffer(render_line, x, *s);
+            x = (uint8_t)(x + adv);
+            s++;
+        }
     }
 
-    do
-    {
-        tmp[n++] = (char)('0' + (v % 10));
-        v /= 10;
-    } while ((v > 0) && (n < (uint8_t)sizeof(tmp)));
-
-    {
-        uint8_t idx = 0;
-        if (neg && (idx < (uint8_t)(out_len - 1U)))
-        {
-            out[idx++] = '-';
-        }
-
-        while ((n > 0U) && (idx < (uint8_t)(out_len - 1U)))
-        {
-            out[idx++] = tmp[--n];
-        }
-        out[idx] = '\0';
-    }
+    oled_flush_buffer();
+}
+#else
+static void oled_render_text(void)
+{
 }
 
-static void oled_render_status(int32_t rx_enc_value, bool sw_state)
+static void oled_flush_step(void)
 {
-    char enc_text[16];
-    char line1[24] = "RX ENC: ";
-    const char *line2 = sw_state ? "SW: GREEN" : "SW: RED";
-    char *p = &line1[8];
-
-    i32_to_dec(rx_enc_value, enc_text, (uint8_t)sizeof(enc_text));
-
-    for (uint8_t i = 0; (enc_text[i] != '\0') && (p < &line1[sizeof(line1) - 1U]); i++)
-    {
-        *p++ = enc_text[i];
-    }
-    *p = '\0';
-
-    ssd1306_clear();
-    (void)ssd1306_write_text(0U, 0U, line1);
-    (void)ssd1306_write_text(2U, 0U, line2);
 }
+#endif
 
-static void settings_load(int32_t *rx_enc_value, bool *sw_state)
+static void settings_load(int32_t *rx_enc_value)
 {
     if (eeprom_read_dword(&ee_magic) == EEPROM_MAGIC)
     {
         *rx_enc_value = (int32_t)eeprom_read_dword(&ee_rx_enc_u32);
-        *sw_state = (eeprom_read_byte(&ee_sw_u8) != 0U);
         return;
     }
 
     // First run / invalid EEPROM contents.
     *rx_enc_value = 0;
-    *sw_state = false;
     eeprom_update_dword(&ee_rx_enc_u32, (uint32_t)*rx_enc_value);
-    eeprom_update_byte(&ee_sw_u8, 0U);
     eeprom_update_dword(&ee_magic, EEPROM_MAGIC);
 }
 
-static void settings_save(int32_t rx_enc_value, bool sw_state)
+static void settings_save(int32_t rx_enc_value)
 {
     eeprom_update_dword(&ee_rx_enc_u32, (uint32_t)rx_enc_value);
-    eeprom_update_byte(&ee_sw_u8, sw_state ? 1U : 0U);
     eeprom_update_dword(&ee_magic, EEPROM_MAGIC);
 }
 
@@ -682,15 +1058,22 @@ int main(void)
 {
     uart_init();
     io_init();
+    g_enc_prev_state = encoder_state_2bit();
+    sei();
+#if OLED_ENABLED
     twi0_init();
     ssd1306_init();
+#endif
 
-    uart_write_str("\r\nATmega4809 ready. MATRIX R=PA7/PA6/PA5 C=PC0..PC3, ENC=PE1/PE2, OLED=PA3/PA2\r\n");
+    uart_write_str("\r\nATmega4809 ready. MATRIX R=PA7/PA6/PA5 C=PC0..PC3, ENC SW=PE1 DT=PE2 CLK=PE3, OLED TXT RX enabled\r\n");
 
-    bool sw_state;
     int32_t rx_enc_value;
-    settings_load(&rx_enc_value, &sw_state);
-    bool oled_dirty = true;
+    settings_load(&rx_enc_value);
+#if OLED_ENABLED
+    oled_render_text();
+    g_oled_text_dirty = false;
+    g_oled_render_holdoff_ms = 0U;
+#endif
     bool nv_dirty = false;
     uint16_t nv_dirty_ms = 0;
 
@@ -698,48 +1081,82 @@ int main(void)
     bool key_state[MATRIX_ROWS][MATRIX_COLS] = {{false}};
     uint8_t key_debounce_ms[MATRIX_ROWS][MATRIX_COLS] = {{0U}};
 
-    // Encoder quadrature decode state.
-    uint8_t enc_prev = encoder_state_2bit();
-    int8_t enc_accum = 0;
+    bool enc_sw_last_sample = true; // pull-up idle high
+    bool enc_sw_stable = true;
+    uint8_t enc_sw_stable_ms = 0;
 
     while (1)
     {
-        bool sw_before = sw_state;
         int32_t enc_before = rx_enc_value;
-        uart_process_rx_commands(&sw_state, &rx_enc_value, &oled_dirty);
-        if ((sw_state != sw_before) || (rx_enc_value != enc_before))
+        serial_task(&rx_enc_value);
+        if (rx_enc_value != enc_before)
         {
             nv_dirty = true;
             nv_dirty_ms = 0;
         }
 
-        // Rotary encoder decode and TX message to PC.
+        if (g_oled_render_holdoff_ms > 0U)
         {
-            uint8_t enc_curr = encoder_state_2bit();
-            int8_t enc_delta = encoder_transition_delta(enc_prev, enc_curr);
-            enc_prev = enc_curr;
+            g_oled_render_holdoff_ms--;
+        }
 
-            if (enc_delta != 0)
+#if OLED_ENABLED
+        if (g_oled_text_dirty && (g_oled_render_holdoff_ms == 0U) && !g_oled_flush_active)
+        {
+            oled_render_text();
+            g_oled_text_dirty = false;
+        }
+
+        oled_flush_step();
+#endif
+
+        // Drain encoder steps captured by interrupt and send to PC.
+        {
+            int16_t pending_steps;
+            cli();
+            pending_steps = g_enc_pending_steps;
+            g_enc_pending_steps = 0;
+            sei();
+
+            if (pending_steps > 0)
             {
-                enc_accum = (int8_t)(enc_accum + enc_delta);
-                if (enc_accum >= 4)
+                rx_enc_value += pending_steps;
+                while (pending_steps-- > 0)
                 {
-                    rx_enc_value++;
                     send_encoder_step(+1);
-                    enc_accum = 0;
-                    oled_dirty = true;
-                    nv_dirty = true;
-                    nv_dirty_ms = 0;
                 }
-                else if (enc_accum <= -4)
+                nv_dirty = true;
+                nv_dirty_ms = 0;
+            }
+            else if (pending_steps < 0)
+            {
+                rx_enc_value += pending_steps;
+                while (pending_steps++ < 0)
                 {
-                    rx_enc_value--;
                     send_encoder_step(-1);
-                    enc_accum = 0;
-                    oled_dirty = true;
-                    nv_dirty = true;
-                    nv_dirty_ms = 0;
                 }
+                nv_dirty = true;
+                nv_dirty_ms = 0;
+            }
+        }
+
+        // Rotary encoder push button (PE1): pressed=LOW.
+        {
+            bool sample_high = (ENC_PORT.IN & ENC_SW_PIN) != 0U;
+
+            if (sample_high != enc_sw_last_sample)
+            {
+                enc_sw_last_sample = sample_high;
+                enc_sw_stable_ms = 0U;
+            }
+            else if (enc_sw_stable_ms < 20U)
+            {
+                enc_sw_stable_ms++;
+            }
+            else if (enc_sw_stable != sample_high)
+            {
+                enc_sw_stable = sample_high;
+                send_encoder_button(!enc_sw_stable);
             }
         }
 
@@ -770,16 +1187,6 @@ int main(void)
                         key_debounce_ms[row][col] = 0U;
                         key_state[row][col] = sample_pressed;
 
-                        // Key (0,0) acts as the software toggle switch.
-                        if (sample_pressed && (row == 0U) && (col == 0U))
-                        {
-                            sw_state = !sw_state;
-                            send_sw_state(sw_state);
-                            oled_dirty = true;
-                            nv_dirty = true;
-                            nv_dirty_ms = 0;
-                        }
-
                         send_key_state(row, col, sample_pressed);
                     }
                 }
@@ -787,12 +1194,6 @@ int main(void)
 
             // Return all rows high between scans.
             MATRIX_ROW_PORT.OUTSET = MATRIX_ROWS_MASK;
-        }
-
-        if (oled_dirty)
-        {
-            oled_render_status(rx_enc_value, sw_state);
-            oled_dirty = false;
         }
 
         if (nv_dirty)
@@ -803,7 +1204,7 @@ int main(void)
             }
             else
             {
-                settings_save(rx_enc_value, sw_state);
+                settings_save(rx_enc_value);
                 nv_dirty = false;
             }
         }
